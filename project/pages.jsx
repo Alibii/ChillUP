@@ -1,7 +1,18 @@
 // pages.jsx — All pages: Home, Pricing, Partners, FAQ, Login, Register, Dashboard
 // Depends on: components.jsx (Brand, Nav, Footer, Icon, Eyebrow, SectionHead, CATEGORIES, PARTNERS)
+//             i18n.js (useLocale, tierLabel, tagLabel, cityLabel)
 
 const { useState: useStateP, useEffect: useEffectP, useMemo: useMemoP, useRef: useRefP } = React;
+
+/* ----- shared helpers ----- */
+function getFaqData(t) {
+  return [0, 1, 2, 3, 4, 5].map(i => ({ q: t(`faq.${i}.q`), a: t(`faq.${i}.a`) }));
+}
+
+function generateAccessToken() {
+  const rnd = () => Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `CHLLP-${rnd()}-${rnd()}`;
+}
 
 /* =========================================================
    HOME
@@ -25,34 +36,32 @@ function HomePage({ go }) {
 
 /* ----- HERO ----- */
 function Hero({ go }) {
+  const { t } = useLocale();
   return (
     <section className="hero">
       <div className="container">
         <div className="hero-grid">
           <div>
-            <Reveal variant="up" delay={0}><Eyebrow>Подписка + Казахстан</Eyebrow></Reveal>
+            <Reveal variant="up" delay={0}><Eyebrow>{t("hero.eyebrow")}</Eyebrow></Reveal>
             <Reveal variant="up" delay={80}>
               <h1 className="hero-headline">
-                Развлекайся<br/>
-                <span className="accent">безлимитно</span>.<br/>
-                Один пасс — <span className="accent-2">всё</span>.
+                {t("hero.headline.line1")}<br/>
+                <span className="accent">{t("hero.headline.line2")}</span>.<br/>
+                {t("hero.headline.line3pre")}<span className="accent-2">{t("hero.headline.line3accent")}</span>.
               </h1>
             </Reveal>
             <Reveal variant="up" delay={160}>
-              <p className="hero-sub">
-                ChillUP — это единая подписка на компьютерные клубы, антикафе, боулинг,
-                настольный теннис и VR-арены. Без счётов, без бронирований — просто приходи и играй.
-              </p>
+              <p className="hero-sub">{t("hero.sub")}</p>
             </Reveal>
             <Reveal variant="up" delay={240}>
               <div className="hero-cta">
                 <Magnetic strength={0.25}>
                   <button className="btn btn--primary btn--lg" onClick={() => go("/register")}>
-                    Попробовать 7 дней бесплатно <Icon name="arrow" size={16}/>
+                    {t("hero.cta.trial")} <Icon name="arrow" size={16}/>
                   </button>
                 </Magnetic>
                 <button className="btn btn--ghost btn--lg" onClick={() => go("/pricing")}>
-                  <Icon name="play" size={14}/> Тарифы
+                  <Icon name="play" size={14}/> {t("hero.cta.pricing")}
                 </button>
               </div>
             </Reveal>
@@ -61,15 +70,15 @@ function Hero({ go }) {
               <div className="flex gap-24 mt-48 wrap">
                 <div>
                   <div className="stat-num" style={{ fontSize: 32 }}><CountUp to={500} suffix="+"/></div>
-                  <div className="stat-label">Партнёров</div>
+                  <div className="stat-label">{t("hero.stat.partners")}</div>
                 </div>
                 <div>
                   <div className="stat-num" style={{ fontSize: 32 }}><CountUp to={50} suffix="+"/></div>
-                  <div className="stat-label">Городов</div>
+                  <div className="stat-label">{t("hero.stat.cities")}</div>
                 </div>
                 <div>
                   <div className="stat-num" style={{ fontSize: 32 }}><CountUp to={50} suffix="K"/></div>
-                  <div className="stat-label">Активных пользователей</div>
+                  <div className="stat-label">{t("hero.stat.users")}</div>
                 </div>
               </div>
             </Reveal>
@@ -89,6 +98,7 @@ function Hero({ go }) {
 
 /* Animated city-grid hero visual */
 function HeroVisual() {
+  const { t } = useLocale();
   const [tick, setTick] = useStateP(0);
   useEffectP(() => {
     const id = setInterval(() => setTick(t => t + 1), 1200);
@@ -154,9 +164,9 @@ function HeroVisual() {
         display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16,
       }}>
         <div>
-          <div className="mono" style={{ fontSize: 10, letterSpacing: ".14em", color: "var(--text-3)", textTransform: "uppercase" }}>СТАТУС СЕТИ · LIVE</div>
+          <div className="mono" style={{ fontSize: 10, letterSpacing: ".14em", color: "var(--text-3)", textTransform: "uppercase" }}>{t("heroVisual.status")}</div>
           <div className="h-display" style={{ fontSize: 20, marginTop: 4 }}>
-            <span style={{ color: "var(--accent)" }}>●</span> 234 заведений онлайн
+            <span style={{ color: "var(--accent)" }}>●</span> 234 {t("heroVisual.venuesOnline")}
           </div>
         </div>
         <div className="mono" style={{ fontSize: 12, color: "var(--text-2)" }}>
@@ -178,12 +188,13 @@ function HeroVisual() {
 
 /* ----- TICKER ----- */
 function Ticker() {
-  const items = ["безлимитные посещения", "500+ партнёров", "₸ один платёж в месяц", "PC · теннис · боулинг · VR", "Россия + Казахстан", "отмена в один клик", "первая неделя бесплатно"];
+  const { t } = useLocale();
+  const items = [0, 1, 2, 3, 4, 5, 6].map(i => t(`ticker.${i}`));
   const doubled = [...items, ...items, ...items];
   return (
     <div className="ticker">
       <div className="ticker-track">
-        {doubled.map((t, i) => <span key={i} className="ticker-item">{t}</span>)}
+        {doubled.map((it, i) => <span key={i} className="ticker-item">{it}</span>)}
       </div>
     </div>
   );
@@ -191,6 +202,7 @@ function Ticker() {
 
 /* ----- CATEGORIES (bento grid) ----- */
 function Categories({ go }) {
+  const { t } = useLocale();
   const layout = [
     { key: "pc",      span: 3, tall: true,  accent: "" },
     { key: "tennis",  span: 3, tall: false, accent: "is-magenta" },
@@ -204,9 +216,9 @@ function Categories({ go }) {
     <section>
       <div className="container">
         <SectionHead
-          kicker="ШЕСТЬ КАТЕГОРИЙ"
-          title="Любой формат отдыха — без выбора между ними."
-          sub="Закрытая сеть из тщательно отобранных заведений. Один пасс открывает все двери."
+          kicker={t("categories.kicker")}
+          title={t("categories.title")}
+          sub={t("categories.sub")}
         />
         <div className="cat-grid">
           {layout.map(({ key, span, tall, accent }, li) => {
@@ -224,8 +236,8 @@ function Categories({ go }) {
                 </div>
                 <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
                   <Icon name={c.icon} size={tall ? 56 : 36} stroke={1.4} style={{ color: "var(--accent)" }}/>
-                  <h3 className="cat-tile-title">{c.label}</h3>
-                  <p className="cat-tile-desc">{c.desc}</p>
+                  <h3 className="cat-tile-title">{t(`category.${key}.label`)}</h3>
+                  <p className="cat-tile-desc">{t(`category.${key}.desc`)}</p>
                 </div>
                 <div className="cat-tile-glow"/>
               </div>
@@ -240,17 +252,18 @@ function Categories({ go }) {
 
 /* ----- HOW IT WORKS ----- */
 function HowItWorks() {
+  const { t } = useLocale();
   const steps = [
-    { n: "01", t: "Скачай приложение", d: "Создай аккаунт за 30 секунд и получи QR-код доступа.", icon: "download" },
-    { n: "02", t: "Выбери тариф",      d: "От базового до VIP. Первая неделя — бесплатно, отмена в один клик.", icon: "creditCard" },
-    { n: "03", t: "Приходи и играй",    d: "Покажи QR на ресепшене любого партнёра. Время не ограничено.", icon: "qr" },
+    { n: "01", key: "step1", icon: "download" },
+    { n: "02", key: "step2", icon: "creditCard" },
+    { n: "03", key: "step3", icon: "qr" },
   ];
   return (
     <section style={{ background: "var(--bg-2)" }}>
       <div className="container">
         <SectionHead
-          kicker="ПРОЦЕСС"
-          title="Три шага между тобой и развлечением."
+          kicker={t("howItWorks.kicker")}
+          title={t("howItWorks.title")}
         />
         <div className="step-row">
           {steps.map((s, si) => (
@@ -258,8 +271,8 @@ function HowItWorks() {
             <div className="step">
               <div className="step-num">{s.n}</div>
               <Icon name={s.icon} size={32} stroke={1.4} style={{ color: "var(--accent)", marginBottom: 16 }}/>
-              <h3 className="step-title">{s.t}</h3>
-              <p className="step-desc">{s.d}</p>
+              <h3 className="step-title">{t(`howItWorks.${s.key}.t`)}</h3>
+              <p className="step-desc">{t(`howItWorks.${s.key}.d`)}</p>
             </div>
             </Reveal>
           ))}
@@ -271,15 +284,16 @@ function HowItWorks() {
 
 /* ----- PRICING PREVIEW (on home) ----- */
 function PricingPreview({ go }) {
+  const { t } = useLocale();
   const [period, setPeriod] = useStateP("month");
   return (
     <section>
       <div className="container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 24, marginBottom: 48 }}>
           <div style={{ maxWidth: 640 }}>
-            <Eyebrow>Тарифы</Eyebrow>
+            <Eyebrow>{t("pricingPreview.kicker")}</Eyebrow>
             <h2 className="h-display" style={{ fontSize: "clamp(36px, 5vw, 64px)", marginTop: 16 }}>
-              Подбери план под свой ритм.
+              {t("pricingPreview.title")}
             </h2>
           </div>
           <BillingToggle period={period} setPeriod={setPeriod} />
@@ -291,64 +305,28 @@ function PricingPreview({ go }) {
 }
 
 function BillingToggle({ period, setPeriod }) {
+  const { t } = useLocale();
   return (
     <div className="toggle">
-      <button className={"toggle-opt" + (period === "month" ? " is-on" : "")} onClick={() => setPeriod("month")}>Месяц</button>
+      <button className={"toggle-opt" + (period === "month" ? " is-on" : "")} onClick={() => setPeriod("month")}>{t("billingToggle.month")}</button>
       <button className={"toggle-opt" + (period === "year" ? " is-on" : "")} onClick={() => setPeriod("year")}>
-        Год <span className="mono" style={{ fontSize: 10, opacity: .8 }}>−20%</span>
+        {t("billingToggle.year")} <span className="mono" style={{ fontSize: 10, opacity: .8 }}>−20%</span>
       </button>
     </div>
   );
 }
 
+/* key/monthly/featured stay fixed; name/tagline/cta/badge/feature text are
+   localized via t('plan.<key>....') — see i18n.js. `features` here is just
+   the ok/not-ok flags in display order. */
 const PLANS = [
-  {
-    key: "basic",
-    name: "Базовый",
-    tagline: "Старт. Несколько вечеров в неделю.",
-    monthly: 990,
-    features: [
-      { ok: true,  t: "Доступ к базовым заведениям" },
-      { ok: true,  t: "До 10 посещений в месяц" },
-      { ok: true,  t: "PC-клубы и антикафе" },
-      { ok: false, t: "Боулинг и настольный теннис" },
-      { ok: false, t: "VIP-заведения" },
-    ],
-    cta: "Начать",
-  },
-  {
-    key: "premium",
-    name: "Премиум",
-    tagline: "Безлимит. Большинству — самое то.",
-    monthly: 1990,
-    featured: true,
-    badge: "ПОПУЛЯРНЫЙ",
-    features: [
-      { ok: true, t: "Все заведения сети" },
-      { ok: true, t: "Безлимитные посещения" },
-      { ok: true, t: "PC, антикафе, теннис, боулинг" },
-      { ok: true, t: "Скидки на партнёров VIP-тира" },
-      { ok: true, t: "Бронирование столов и дорожек" },
-    ],
-    cta: "Выбрать Премиум",
-  },
-  {
-    key: "vip",
-    name: "VIP",
-    tagline: "Для тех, кто живёт в клубе.",
-    monthly: 3990,
-    features: [
-      { ok: true, t: "Все заведения, включая VIP" },
-      { ok: true, t: "Безлимит + 2 часа боулинга/мес" },
-      { ok: true, t: "Эксклюзивные турниры" },
-      { ok: true, t: "Приоритетная поддержка 24/7" },
-      { ok: true, t: "Гость +1 раз в неделю" },
-    ],
-    cta: "Стать VIP",
-  },
+  { key: "basic",   monthly: 990,  features: [true, true, true, false, false] },
+  { key: "premium", monthly: 1990, featured: true, features: [true, true, true, true, true] },
+  { key: "vip",     monthly: 3990, features: [true, true, true, true, true] },
 ];
 
 function PlanGrid({ period, go }) {
+  const { t } = useLocale();
   const yearMult = 12 * 0.8;
   return (
     <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
@@ -357,25 +335,25 @@ function PlanGrid({ period, go }) {
         return (
           <Reveal key={p.key} variant="up" delay={pi * 110}>
           <div className={"card plan-card card--hover" + (p.featured ? " is-featured" : "")}>
-            {p.badge && <span className="plan-badge">{p.badge}</span>}
-            <h3 className="plan-name">{p.name}</h3>
-            <p className="plan-tagline">{p.tagline}</p>
+            {p.key === "premium" && <span className="plan-badge">{t("plan.premium.badge")}</span>}
+            <h3 className="plan-name">{t(`plan.${p.key}.name`)}</h3>
+            <p className="plan-tagline">{t(`plan.${p.key}.tagline`)}</p>
             <div className="plan-price">
               <span className="amount">{price.toLocaleString("ru-RU")}</span>
               <span className="currency">₸</span>
-              <span className="period">/ {period === "year" ? "год" : "мес"}</span>
+              <span className="period">/ {period === "year" ? t("billingToggle.year") : t("plan.perMonth").replace("/", "")}</span>
             </div>
-            {period === "year" && <div className="mono" style={{ fontSize: 11, color: "var(--good)" }}>Экономия {Math.round((p.monthly * 12) - price).toLocaleString("ru-RU")} ₸ за год</div>}
+            {period === "year" && <div className="mono" style={{ fontSize: 11, color: "var(--good)" }}>{t("plan.yearSavings", { amount: Math.round((p.monthly * 12) - price).toLocaleString("ru-RU") })}</div>}
             <ul className="plan-features">
-              {p.features.map((f, i) => (
-                <li key={i} className={f.ok ? "" : "is-off"}>
-                  <Icon name={f.ok ? "check" : "cross"} size={16} style={{ color: f.ok ? "var(--accent)" : "var(--text-3)" }}/>
-                  {f.t}
+              {p.features.map((ok, i) => (
+                <li key={i} className={ok ? "" : "is-off"}>
+                  <Icon name={ok ? "check" : "cross"} size={16} style={{ color: ok ? "var(--accent)" : "var(--text-3)" }}/>
+                  {t(`plan.${p.key}.feature.${i}`)}
                 </li>
               ))}
             </ul>
             <button className={"btn btn--block " + (p.featured ? "btn--primary" : "btn--secondary")} onClick={() => go("/register")}>
-              {p.cta} <Icon name="arrow" size={14}/>
+              {t(`plan.${p.key}.cta`)} <Icon name="arrow" size={14}/>
             </button>
           </div>
           </Reveal>
@@ -387,18 +365,19 @@ function PlanGrid({ period, go }) {
 
 /* ----- PARTNERS PREVIEW ----- */
 function PartnersPreview({ go }) {
+  const { t } = useLocale();
   return (
     <section style={{ background: "var(--bg-2)" }}>
       <div className="container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 24, marginBottom: 48 }}>
           <div style={{ maxWidth: 640 }}>
-            <Eyebrow>Сеть · 500+ точек</Eyebrow>
+            <Eyebrow>{t("partnersPreview.kicker")}</Eyebrow>
             <h2 className="h-display" style={{ fontSize: "clamp(36px, 5vw, 64px)", marginTop: 16 }}>
-              Партнёры, которым доверяют 50K игроков.
+              {t("partnersPreview.title")}
             </h2>
           </div>
           <button className="btn btn--ghost" onClick={() => go("/partners")}>
-            Смотреть всех <Icon name="arrowUR" size={14}/>
+            {t("partnersPreview.viewAll")} <Icon name="arrowUR" size={14}/>
           </button>
         </div>
         <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
@@ -410,22 +389,23 @@ function PartnersPreview({ go }) {
 }
 
 function PartnerCard({ p, idx }) {
+  const { t } = useLocale();
   const cat = CATEGORIES.find(c => c.key === p.cat);
   return (
     <Reveal variant="up" delay={(idx % 3) * 90}>
     <div className="card partner-card card--hover">
       <div className="partner-img">
         <Icon name={cat.icon} size={64} stroke={1.2} style={{ color: "var(--accent)", opacity: .9 }}/>
-        <span className="partner-img-label">№ {String(idx + 1).padStart(3, "0")} · {cat.label}</span>
+        <span className="partner-img-label">№ {String(idx + 1).padStart(3, "0")} · {t(`category.${cat.key}.label`)}</span>
       </div>
       <div className="partner-body">
         <div className="flex between middle">
           <h3 className="partner-name">{p.name}</h3>
-          <span className={"chip " + (p.tier === "VIP" ? "chip--magenta" : p.tier === "Премиум" ? "chip--accent" : "")}>{p.tier}</span>
+          <span className={"chip " + (p.tier === "VIP" ? "chip--magenta" : p.tier === "Премиум" ? "chip--accent" : "")}>{tierLabel(p.tier, t)}</span>
         </div>
-        <div className="partner-meta"><Icon name="pin" size={12}/> {p.city} · {p.address}</div>
+        <div className="partner-meta"><Icon name="pin" size={12}/> {cityLabel(p.city, t)} · {p.address}</div>
         <div className="flex gap-8 wrap">
-          {p.tags.map(t => <span key={t} className="chip">{t}</span>)}
+          {p.tags.map(tag => <span key={tag} className="chip">{tagLabel(tag, t)}</span>)}
         </div>
       </div>
     </div>
@@ -435,11 +415,12 @@ function PartnerCard({ p, idx }) {
 
 /* ----- STATS ----- */
 function Stats() {
+  const { t } = useLocale();
   const items = [
-    { to: 500, suffix: "+", label: "Партнёров в сети" },
-    { to: 50,  suffix: "+", label: "Городов" },
-    { to: 1.2, suffix: "M", decimals: 1, label: "Часов отыграно" },
-    { to: 98,  suffix: "%", label: "Возвращаемость" },
+    { to: 500, suffix: "+", label: t("stats.partners") },
+    { to: 50,  suffix: "+", label: t("stats.cities") },
+    { to: 1.2, suffix: "M", decimals: 1, label: t("stats.hours") },
+    { to: 98,  suffix: "%", label: t("stats.retention") },
   ];
   return (
     <section className="tight">
@@ -461,28 +442,29 @@ function Stats() {
 
 /* ----- TESTIMONIALS ----- */
 function Testimonials() {
+  const { t } = useLocale();
   const items = [
-    { q: "Раньше тратил по 30к в месяц на компьютерный клуб. Теперь хожу куда хочу за 2к — это какая-то магия.", name: "Ермек К.", role: "Разработчик · Алматы", initials: "ЕК" },
-    { q: "С друзьями катаемся то в боулинг, то в антикафе. Одна подписка, никакой возни с кошельками.", name: "Дина А.", role: "Студентка · Астана", initials: "ДА" },
-    { q: "Теннис три раза в неделю — окупается на четвёртый день. Сервис огонь.", name: "Армат С.", role: "Тренер · Шымкент", initials: "АС" },
+    { q: t("testimonial.0.q"), name: "Ермек К.", role: t("testimonial.0.role"), initials: "ЕК" },
+    { q: t("testimonial.1.q"), name: "Дина А.", role: t("testimonial.1.role"), initials: "ДА" },
+    { q: t("testimonial.2.q"), name: "Армат С.", role: t("testimonial.2.role"), initials: "АС" },
   ];
   return (
     <section>
       <div className="container">
-        <SectionHead kicker="ОТЗЫВЫ" title="Что говорят пользователи." />
+        <SectionHead kicker={t("testimonials.kicker")} title={t("testimonials.title")} />
         <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-          {items.map((t, i) => (
+          {items.map((t2, i) => (
             <Reveal key={i} variant="up" delay={i * 100}>
             <div className="card tcard">
               <div className="flex gap-8 mb-16">
                 {[...Array(5)].map((_, j) => <Icon key={j} name="star" size={14} style={{ color: "var(--accent)", fill: "var(--accent)" }}/>)}
               </div>
-              <q>{t.q}</q>
+              <q>{t2.q}</q>
               <div className="t-author">
-                <div className="t-avatar">{t.initials}</div>
+                <div className="t-avatar">{t2.initials}</div>
                 <div className="t-meta">
-                  <span className="t-name">{t.name}</span>
-                  <span className="t-role">{t.role}</span>
+                  <span className="t-name">{t2.name}</span>
+                  <span className="t-role">{t2.role}</span>
                 </div>
               </div>
             </div>
@@ -495,33 +477,26 @@ function Testimonials() {
 }
 
 /* ----- FAQ ----- */
-const FAQ_DATA = [
-  { q: "Как работает подписка ChillUP?", a: "Вы оплачиваете один из тарифов (Базовый, Премиум или VIP) и получаете в приложении QR-код, который показываете на ресепшене любого партнёрского заведения. Никаких дополнительных платежей." },
-  { q: "Можно отменить в любой момент?", a: "Да. Отмена происходит в один клик в личном кабинете. Доступ сохраняется до конца оплаченного периода." },
-  { q: "Что входит в Премиум, но не входит в Базовый?", a: "Премиум открывает безлимитные посещения, боулинг и настольный теннис, а также скидки на VIP-партнёров." },
-  { q: "Есть ли пробный период?", a: "Да, первые 7 дней — бесплатно. Карту привязывать не обязательно для базового тарифа." },
-  { q: "Можно ли заморозить подписку?", a: "Можно заморозить на срок до 3 месяцев один раз в год, например на время отъезда." },
-  { q: "Работает ли ChillUP в России?", a: "Да, подписка действует в России и Казахстане — список городов смотрите на странице партнёров." },
-];
-
 function FaqPreview({ go }) {
+  const { t } = useLocale();
   const [open, setOpen] = useStateP(0);
+  const faqData = getFaqData(t);
   return (
     <section style={{ background: "var(--bg-2)" }}>
       <div className="container">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 64, alignItems: "start" }}>
           <div>
-            <Eyebrow>FAQ</Eyebrow>
+            <Eyebrow>{t("faqPreview.kicker")}</Eyebrow>
             <h2 className="h-display" style={{ fontSize: "clamp(36px, 5vw, 56px)", marginTop: 16, marginBottom: 16 }}>
-              Вопросы, которые задают чаще всего.
+              {t("faqPreview.title")}
             </h2>
             <p className="muted" style={{ fontSize: 16, lineHeight: 1.5, marginBottom: 24 }}>
-              Не нашли ответа? Поддержка работает 24/7 в чате приложения.
+              {t("faqPreview.sub")}
             </p>
-            <button className="btn btn--ghost" onClick={() => go("/faq")}>Все вопросы <Icon name="arrow" size={14}/></button>
+            <button className="btn btn--ghost" onClick={() => go("/faq")}>{t("faqPreview.viewAll")} <Icon name="arrow" size={14}/></button>
           </div>
           <div>
-            {FAQ_DATA.slice(0, 5).map((it, i) => (
+            {faqData.slice(0, 5).map((it, i) => (
               <div key={i} className={"faq-item" + (open === i ? " is-open" : "")} onClick={() => setOpen(open === i ? -1 : i)}>
                 <div className="faq-head">
                   <span className="faq-q">{it.q}</span>
@@ -539,6 +514,7 @@ function FaqPreview({ go }) {
 
 /* ----- DOWNLOAD CTA ----- */
 function DownloadCTA() {
+  const { t } = useLocale();
   return (
     <section>
       <div className="container">
@@ -553,12 +529,12 @@ function DownloadCTA() {
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(60% 70% at 80% 50%, color-mix(in oklab, var(--accent) 25%, transparent), transparent)" }}/>
           <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 32, alignItems: "center", position: "relative" }}>
             <div>
-              <Eyebrow>iOS · Android</Eyebrow>
+              <Eyebrow>{t("downloadCTA.eyebrow")}</Eyebrow>
               <h2 className="h-display" style={{ fontSize: "clamp(36px, 5vw, 64px)", margin: "16px 0" }}>
-                Скачай ChillUP и приходи играть.
+                {t("downloadCTA.title")}
               </h2>
               <p className="muted" style={{ fontSize: 16, marginBottom: 24, maxWidth: 480, lineHeight: 1.5 }}>
-                Управляй подпиской, находи заведения рядом, бронируй столы и дорожки прямо в приложении.
+                {t("downloadCTA.sub")}
               </p>
               <div className="flex gap-12 wrap">
                 <button className="btn btn--primary btn--lg"><Icon name="apple" size={16}/> App Store</button>
@@ -576,6 +552,7 @@ function DownloadCTA() {
 }
 
 function PhoneMock() {
+  const { t } = useLocale();
   return (
     <div className="float" style={{
       width: 220, height: 440,
@@ -608,8 +585,8 @@ function PhoneMock() {
         }}>
           <Icon name="qr" size={60} stroke={1.4} style={{ color: "var(--accent)" }}/>
         </div>
-        <div className="h-display" style={{ fontSize: 14 }}>Премиум · активен</div>
-        <div className="mono dim" style={{ fontSize: 9 }}>До 14 декабря</div>
+        <div className="h-display" style={{ fontSize: 14 }}>{t("phoneMock.planActive")}</div>
+        <div className="mono dim" style={{ fontSize: 9 }}>{t("phoneMock.until")}</div>
         <div className="bar"><span style={{ width: "62%" }}/></div>
       </div>
     </div>
@@ -620,17 +597,18 @@ function PhoneMock() {
    PRICING PAGE
    ========================================================= */
 function PricingPage({ go }) {
+  const { t } = useLocale();
   const [period, setPeriod] = useStateP("month");
   return (
     <>
       <section className="hero" style={{ paddingTop: 64, paddingBottom: 48 }}>
         <div className="container center" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
-          <Eyebrow>Тарифы</Eyebrow>
+          <Eyebrow>{t("pricingPage.eyebrow")}</Eyebrow>
           <h1 className="h-display" style={{ fontSize: "clamp(48px, 7vw, 96px)" }}>
-            Один план — <span style={{ color: "var(--accent)" }}>вся</span> сеть.
+            {t("pricingPage.title.pre")}<span style={{ color: "var(--accent)" }}>{t("pricingPage.title.accent")}</span>{t("pricingPage.title.post")}
           </h1>
           <p className="muted" style={{ fontSize: 18, maxWidth: 600, lineHeight: 1.5 }}>
-            Прозрачная цена, отмена в один клик, первая неделя — бесплатно.
+            {t("pricingPage.sub")}
           </p>
           <BillingToggle period={period} setPeriod={setPeriod}/>
         </div>
@@ -648,26 +626,28 @@ function PricingPage({ go }) {
 }
 
 function ComparisonTable() {
-  const rows = [
-    { f: "Доступ к PC-клубам и антикафе",      values: [true, true, true] },
-    { f: "Безлимитные посещения",               values: [false, true, true] },
-    { f: "Боулинг и настольный теннис",         values: [false, true, true] },
-    { f: "VIP-заведения",                       values: [false, false, true] },
-    { f: "Бронирование онлайн",                 values: [false, true, true] },
-    { f: "Гость +1 раз в неделю",               values: [false, false, true] },
-    { f: "Приоритетная поддержка 24/7",         values: [false, false, true] },
-    { f: "2 часа боулинга в подарок (мес)",     values: [false, false, true] },
+  const { t } = useLocale();
+  const rowValues = [
+    [true, true, true],
+    [false, true, true],
+    [false, true, true],
+    [false, false, true],
+    [false, true, true],
+    [false, false, true],
+    [false, false, true],
+    [false, false, true],
   ];
+  const rows = rowValues.map((values, i) => ({ f: t(`comparisonTable.row.${i}`), values }));
   return (
     <section>
       <div className="container">
-        <SectionHead kicker="СРАВНЕНИЕ" title="Что входит в каждый план."/>
+        <SectionHead kicker={t("comparisonTable.kicker")} title={t("comparisonTable.title")}/>
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", padding: "20px 28px", borderBottom: "1px solid var(--line)" }}>
-            <span className="label">Возможности</span>
-            <span className="label center">Базовый</span>
-            <span className="label center" style={{ color: "var(--accent)" }}>Премиум</span>
-            <span className="label center">VIP</span>
+            <span className="label">{t("comparisonTable.header.features")}</span>
+            <span className="label center">{t("plan.basic.name")}</span>
+            <span className="label center" style={{ color: "var(--accent)" }}>{t("plan.premium.name")}</span>
+            <span className="label center">{t("plan.vip.name")}</span>
           </div>
           {rows.map((r, i) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", padding: "16px 28px", borderBottom: i < rows.length - 1 ? "1px solid var(--line)" : "none", alignItems: "center" }}>
@@ -686,16 +666,13 @@ function ComparisonTable() {
 }
 
 function PricingFAQ() {
+  const { t } = useLocale();
   const [open, setOpen] = useStateP(0);
-  const items = [
-    { q: "Когда происходит списание?", a: "В день оформления подписки и далее каждый месяц или год — в зависимости от выбранного периода." },
-    { q: "Можно ли вернуть деньги?", a: "Возврат возможен в течение 14 дней с момента оплаты при условии, что вы не использовали услуги." },
-    { q: "Что произойдёт по окончании пробного периода?", a: "Списание произойдёт автоматически по выбранному тарифу. Вы можете отменить подписку до окончания триала без списания." },
-  ];
+  const items = [0, 1, 2].map(i => ({ q: t(`pricingFaq.${i}.q`), a: t(`pricingFaq.${i}.a`) }));
   return (
     <section>
       <div className="container" style={{ maxWidth: 800 }}>
-        <SectionHead kicker="УСЛОВИЯ" title="Подписка без сюрпризов." align="left"/>
+        <SectionHead kicker={t("pricingFaq.kicker")} title={t("pricingFaq.title")} align="left"/>
         {items.map((it, i) => (
           <div key={i} className={"faq-item" + (open === i ? " is-open" : "")} onClick={() => setOpen(open === i ? -1 : i)}>
             <div className="faq-head">
@@ -714,6 +691,7 @@ function PricingFAQ() {
    PARTNERS PAGE (with filters)
    ========================================================= */
 function PartnersPage({ go }) {
+  const { t } = useLocale();
   const [q, setQ] = useStateP("");
   const [city, setCity] = useStateP("all");
   const [cat, setCat] = useStateP("all");
@@ -735,12 +713,12 @@ function PartnersPage({ go }) {
     <>
       <section className="hero" style={{ paddingTop: 64, paddingBottom: 48 }}>
         <div className="container center" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-          <Eyebrow>Партнёры · 500+ точек</Eyebrow>
+          <Eyebrow>{t("partnersPage.eyebrow")}</Eyebrow>
           <h1 className="h-display" style={{ fontSize: "clamp(48px, 7vw, 96px)" }}>
-            Сеть, которая <span style={{ color: "var(--accent)" }}>растёт</span>.
+            {t("partnersPage.title.pre")}<span style={{ color: "var(--accent)" }}>{t("partnersPage.title.accent")}</span>{t("partnersPage.title.post")}
           </h1>
           <p className="muted" style={{ fontSize: 18, maxWidth: 640, lineHeight: 1.5 }}>
-            Каждое заведение проходит проверку. Никаких сюрпризов в качестве.
+            {t("partnersPage.sub")}
           </p>
         </div>
       </section>
@@ -752,29 +730,29 @@ function PartnersPage({ go }) {
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 12 }}>
               <div style={{ position: "relative" }}>
                 <Icon name="search" size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)" }}/>
-                <input className="input" placeholder="Поиск по названию, городу, адресу..." value={q} onChange={e => setQ(e.target.value)} style={{ paddingLeft: 40 }}/>
+                <input className="input" placeholder={t("partnersPage.searchPlaceholder")} value={q} onChange={e => setQ(e.target.value)} style={{ paddingLeft: 40 }}/>
               </div>
               <select className="input" value={city} onChange={e => setCity(e.target.value)}>
-                {cities.map(c => <option key={c} value={c}>{c === "all" ? "Все города" : c}</option>)}
+                {cities.map(c => <option key={c} value={c}>{c === "all" ? t("partnersPage.allCities") : cityLabel(c, t)}</option>)}
               </select>
               <select className="input" value={cat} onChange={e => setCat(e.target.value)}>
-                <option value="all">Все категории</option>
-                {CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+                <option value="all">{t("partnersPage.allCategories")}</option>
+                {CATEGORIES.map(c => <option key={c.key} value={c.key}>{t(`category.${c.key}.label`)}</option>)}
               </select>
               <select className="input" value={tier} onChange={e => setTier(e.target.value)}>
-                <option value="all">Все тиры</option>
-                <option>Базовый</option>
-                <option>Премиум</option>
-                <option>VIP</option>
+                <option value="all">{t("partnersPage.allTiers")}</option>
+                <option value="Базовый">{t("tier.basic")}</option>
+                <option value="Премиум">{t("tier.premium")}</option>
+                <option value="VIP">{t("tier.vip")}</option>
               </select>
             </div>
             <div className="flex gap-8 mt-16 wrap" style={{ justifyContent: "space-between", alignItems: "center" }}>
               <div className="flex gap-8 wrap">
-                {[["all", "Все"], ...CATEGORIES.map(c => [c.key, c.label])].map(([k, l]) => (
+                {[["all", t("partnersPage.all")], ...CATEGORIES.map(c => [c.key, t(`category.${c.key}.label`)])].map(([k, l]) => (
                   <button key={k} className={"chip " + (cat === k ? "chip--accent" : "")} onClick={() => setCat(k)}>{l}</button>
                 ))}
               </div>
-              <span className="mono dim" style={{ fontSize: 12 }}>Найдено: {filtered.length}</span>
+              <span className="mono dim" style={{ fontSize: 12 }}>{t("partnersPage.foundTemplate", { n: filtered.length })}</span>
             </div>
           </div>
 
@@ -784,9 +762,9 @@ function PartnersPage({ go }) {
           </div>
           {filtered.length === 0 && (
             <div className="card center" style={{ padding: 48 }}>
-              <h3 className="h-display" style={{ fontSize: 24, marginBottom: 8 }}>Ничего не нашли</h3>
-              <p className="muted">Попробуйте изменить фильтры или сбросить поиск.</p>
-              <button className="btn btn--secondary mt-16" onClick={() => { setQ(""); setCity("all"); setCat("all"); setTier("all"); }}>Сбросить</button>
+              <h3 className="h-display" style={{ fontSize: 24, marginBottom: 8 }}>{t("partnersPage.emptyTitle")}</h3>
+              <p className="muted">{t("partnersPage.emptyDesc")}</p>
+              <button className="btn btn--secondary mt-16" onClick={() => { setQ(""); setCity("all"); setCat("all"); setTier("all"); }}>{t("partnersPage.reset")}</button>
             </div>
           )}
         </div>
@@ -799,20 +777,22 @@ function PartnersPage({ go }) {
    FAQ PAGE
    ========================================================= */
 function FaqPage() {
+  const { t } = useLocale();
   const [open, setOpen] = useStateP(0);
+  const faqData = getFaqData(t);
   return (
     <>
       <section className="hero" style={{ paddingTop: 64, paddingBottom: 48 }}>
         <div className="container center" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-          <Eyebrow>FAQ</Eyebrow>
+          <Eyebrow>{t("faqPage.eyebrow")}</Eyebrow>
           <h1 className="h-display" style={{ fontSize: "clamp(48px, 7vw, 96px)" }}>
-            Часто <span style={{ color: "var(--accent)" }}>спрашивают</span>.
+            {t("faqPage.title.pre")}<span style={{ color: "var(--accent)" }}>{t("faqPage.title.accent")}</span>{t("faqPage.title.post")}
           </h1>
         </div>
       </section>
       <section style={{ paddingTop: 0 }}>
         <div className="container" style={{ maxWidth: 800 }}>
-          {FAQ_DATA.map((it, i) => (
+          {faqData.map((it, i) => (
             <div key={i} className={"faq-item" + (open === i ? " is-open" : "")} onClick={() => setOpen(open === i ? -1 : i)}>
               <div className="faq-head">
                 <span className="faq-q">{it.q}</span>
@@ -824,10 +804,10 @@ function FaqPage() {
 
           <div className="card mt-48 center" style={{ padding: 40 }}>
             <Icon name="bell" size={28} stroke={1.4} style={{ color: "var(--accent)", margin: "0 auto 12px" }}/>
-            <h3 className="h-display" style={{ fontSize: 24 }}>Не нашли ответ?</h3>
-            <p className="muted mt-8" style={{ marginBottom: 16 }}>Поддержка работает 24/7 в приложении и в Telegram.</p>
+            <h3 className="h-display" style={{ fontSize: 24 }}>{t("faqPage.notFound.title")}</h3>
+            <p className="muted mt-8" style={{ marginBottom: 16 }}>{t("faqPage.notFound.sub")}</p>
             <div className="flex gap-8" style={{ justifyContent: "center" }}>
-              <button className="btn btn--primary">Открыть чат</button>
+              <button className="btn btn--primary">{t("faqPage.openChat")}</button>
               <button className="btn btn--secondary">Telegram</button>
             </div>
           </div>
@@ -841,53 +821,54 @@ function FaqPage() {
    LOGIN
    ========================================================= */
 function LoginPage({ go }) {
+  const { t } = useLocale();
   return (
     <section className="hero">
       <div className="container" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center", minHeight: "70vh" }}>
         <div>
-          <Eyebrow>Вход</Eyebrow>
+          <Eyebrow>{t("loginPage.eyebrow")}</Eyebrow>
           <h1 className="h-display" style={{ fontSize: "clamp(40px, 6vw, 72px)", marginTop: 16, marginBottom: 16 }}>
-            С возвращением.<br/><span style={{ color: "var(--accent)" }}>Игра ждёт.</span>
+            {t("loginPage.title.line1")}<br/><span style={{ color: "var(--accent)" }}>{t("loginPage.title.accent")}</span>
           </h1>
           <p className="muted" style={{ fontSize: 16, maxWidth: 440, lineHeight: 1.5 }}>
-            Войди, чтобы открыть QR-доступ к 500+ заведениям и управлять подпиской.
+            {t("loginPage.sub")}
           </p>
           <div className="mt-32 flex gap-12">
             <div>
               <div className="stat-num" style={{ fontSize: 24 }}>500+</div>
-              <div className="stat-label mt-8">Партнёров</div>
+              <div className="stat-label mt-8">{t("loginPage.stat.partners")}</div>
             </div>
             <div style={{ width: 1, background: "var(--line)" }}/>
             <div>
               <div className="stat-num" style={{ fontSize: 24 }}>50K</div>
-              <div className="stat-label mt-8">Пользователей</div>
+              <div className="stat-label mt-8">{t("loginPage.stat.users")}</div>
             </div>
           </div>
         </div>
         <div className="card" style={{ padding: 40 }}>
-          <h2 className="h-display" style={{ fontSize: 28, marginBottom: 24 }}>Войти</h2>
+          <h2 className="h-display" style={{ fontSize: 28, marginBottom: 24 }}>{t("loginPage.formTitle")}</h2>
           <div className="col gap-16">
             <div className="field">
-              <span className="label">Email или телефон</span>
+              <span className="label">{t("loginPage.field.login")}</span>
               <input className="input" placeholder="you@chillup.kz" defaultValue="ermek@chillup.kz"/>
             </div>
             <div className="field">
-              <span className="label">Пароль</span>
+              <span className="label">{t("loginPage.field.password")}</span>
               <input className="input" type="password" placeholder="••••••••" defaultValue="••••••••"/>
             </div>
             <div className="flex between middle">
               <label className="flex gap-8 middle" style={{ fontSize: 13, color: "var(--text-2)", cursor: "pointer" }}>
-                <input type="checkbox" defaultChecked/> Запомнить
+                <input type="checkbox" defaultChecked/> {t("loginPage.remember")}
               </label>
-              <a className="mono" style={{ fontSize: 12, color: "var(--accent)" }}>Забыли пароль?</a>
+              <a className="mono" style={{ fontSize: 12, color: "var(--accent)" }}>{t("loginPage.forgot")}</a>
             </div>
             <button className="btn btn--primary btn--block btn--lg" onClick={() => go("/dashboard")}>
-              Войти <Icon name="arrow" size={14}/>
+              {t("loginPage.submit")} <Icon name="arrow" size={14}/>
             </button>
-            <div className="center mono dim" style={{ fontSize: 11, marginTop: 8 }}>ИЛИ</div>
-            <button className="btn btn--secondary btn--block">Войти через Telegram</button>
+            <div className="center mono dim" style={{ fontSize: 11, marginTop: 8 }}>{t("loginPage.or")}</div>
+            <button className="btn btn--secondary btn--block">{t("loginPage.telegram")}</button>
             <div className="center muted mt-16" style={{ fontSize: 13 }}>
-              Нет аккаунта? <a onClick={() => go("/register")} style={{ color: "var(--accent)", cursor: "pointer" }}>Регистрация</a>
+              {t("loginPage.noAccount")} <a onClick={() => go("/register")} style={{ color: "var(--accent)", cursor: "pointer" }}>{t("loginPage.registerLink")}</a>
             </div>
           </div>
         </div>
@@ -900,6 +881,7 @@ function LoginPage({ go }) {
    REGISTER
    ========================================================= */
 function RegisterPage({ go }) {
+  const { t } = useLocale();
   const [step, setStep] = useStateP(0);
   const [plan, setPlan] = useStateP("premium");
 
@@ -907,15 +889,15 @@ function RegisterPage({ go }) {
     <section className="hero">
       <div className="container" style={{ maxWidth: 720 }}>
         <div className="center mb-32">
-          <Eyebrow>Регистрация · 7 дней бесплатно</Eyebrow>
+          <Eyebrow>{t("registerPage.eyebrow")}</Eyebrow>
           <h1 className="h-display" style={{ fontSize: "clamp(40px, 6vw, 64px)", marginTop: 16 }}>
-            Стань частью сети <span style={{ color: "var(--accent)" }}>ChillUP</span>.
+            {t("registerPage.titleBefore")}<span style={{ color: "var(--accent)" }}>ChillUP</span>{t("registerPage.titleAfter")}
           </h1>
         </div>
 
         {/* Stepper */}
         <div className="flex gap-12 mb-32" style={{ justifyContent: "center" }}>
-          {["Аккаунт", "Тариф", "Готово"].map((s, i) => (
+          {[t("registerPage.stepper.account"), t("registerPage.stepper.plan"), t("registerPage.stepper.done")].map((s, i) => (
             <div key={i} className="flex gap-8 middle">
               <div style={{
                 width: 28, height: 28, borderRadius: "50%",
@@ -934,34 +916,34 @@ function RegisterPage({ go }) {
         <div className="card" style={{ padding: 40 }}>
           {step === 0 && (
             <div className="col gap-16">
-              <h2 className="h-display" style={{ fontSize: 24, margin: 0 }}>Создай аккаунт</h2>
+              <h2 className="h-display" style={{ fontSize: 24, margin: 0 }}>{t("registerPage.step0.title")}</h2>
               <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
-                <div className="field"><span className="label">Имя</span><input className="input" defaultValue="Ермек"/></div>
-                <div className="field"><span className="label">Фамилия</span><input className="input" defaultValue="Касенов"/></div>
+                <div className="field"><span className="label">{t("registerPage.field.firstName")}</span><input className="input" defaultValue="Ермек"/></div>
+                <div className="field"><span className="label">{t("registerPage.field.lastName")}</span><input className="input" defaultValue="Касенов"/></div>
               </div>
-              <div className="field"><span className="label">Email</span><input className="input" type="email" defaultValue="ermek@chillup.kz"/></div>
-              <div className="field"><span className="label">Телефон</span><input className="input" defaultValue="+7 (777) 123-45-67"/></div>
-              <div className="field"><span className="label">Пароль</span><input className="input" type="password" defaultValue="••••••••"/></div>
+              <div className="field"><span className="label">{t("registerPage.field.email")}</span><input className="input" type="email" defaultValue="ermek@chillup.kz"/></div>
+              <div className="field"><span className="label">{t("registerPage.field.phone")}</span><input className="input" defaultValue="+7 (777) 123-45-67"/></div>
+              <div className="field"><span className="label">{t("registerPage.field.password")}</span><input className="input" type="password" defaultValue="••••••••"/></div>
               <div className="flex gap-12">
-                <button className="btn btn--secondary fill" onClick={() => go("/")}>Отмена</button>
-                <button className="btn btn--primary fill" onClick={() => setStep(1)}>Дальше <Icon name="arrow" size={14}/></button>
+                <button className="btn btn--secondary fill" onClick={() => go("/")}>{t("registerPage.cancel")}</button>
+                <button className="btn btn--primary fill" onClick={() => setStep(1)}>{t("registerPage.next")} <Icon name="arrow" size={14}/></button>
               </div>
             </div>
           )}
           {step === 1 && (
             <div className="col gap-16">
-              <h2 className="h-display" style={{ fontSize: 24, margin: 0 }}>Выбери тариф</h2>
+              <h2 className="h-display" style={{ fontSize: 24, margin: 0 }}>{t("registerPage.step1.title")}</h2>
               {PLANS.map(p => (
                 <div key={p.key} className={"card card--hover " + (plan === p.key ? "card--accent" : "")} style={{ padding: 20, cursor: "pointer" }} onClick={() => setPlan(p.key)}>
                   <div className="flex between middle">
                     <div>
-                      <h3 className="plan-name" style={{ margin: 0 }}>{p.name}</h3>
-                      <span className="plan-tagline" style={{ display: "block", marginTop: 4 }}>{p.tagline}</span>
+                      <h3 className="plan-name" style={{ margin: 0 }}>{t(`plan.${p.key}.name`)}</h3>
+                      <span className="plan-tagline" style={{ display: "block", marginTop: 4 }}>{t(`plan.${p.key}.tagline`)}</span>
                     </div>
                     <div className="flex middle gap-12">
                       <div style={{ textAlign: "right" }}>
                         <div className="h-display" style={{ fontSize: 24 }}>{p.monthly.toLocaleString("ru-RU")} ₸</div>
-                        <div className="mono dim" style={{ fontSize: 11 }}>/мес</div>
+                        <div className="mono dim" style={{ fontSize: 11 }}>{t("registerPage.perMonth")}</div>
                       </div>
                       <div style={{
                         width: 20, height: 20, borderRadius: "50%",
@@ -976,8 +958,8 @@ function RegisterPage({ go }) {
                 </div>
               ))}
               <div className="flex gap-12">
-                <button className="btn btn--secondary fill" onClick={() => setStep(0)}>Назад</button>
-                <button className="btn btn--primary fill" onClick={() => setStep(2)}>Активировать триал <Icon name="bolt" size={14}/></button>
+                <button className="btn btn--secondary fill" onClick={() => setStep(0)}>{t("registerPage.back")}</button>
+                <button className="btn btn--primary fill" onClick={() => setStep(2)}>{t("registerPage.activateTrial")} <Icon name="bolt" size={14}/></button>
               </div>
             </div>
           )}
@@ -986,14 +968,13 @@ function RegisterPage({ go }) {
               <div style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--accent)", display: "grid", placeItems: "center", boxShadow: "var(--glow-accent)" }}>
                 <Icon name="check" size={40} stroke={2.5} style={{ color: "#000" }}/>
               </div>
-              <h2 className="h-display" style={{ fontSize: 36, margin: 0 }}>Всё готово!</h2>
+              <h2 className="h-display" style={{ fontSize: 36, margin: 0 }}>{t("registerPage.step2.title")}</h2>
               <p className="muted" style={{ maxWidth: 420, lineHeight: 1.5 }}>
-                Твой 7-дневный триал тарифа <b style={{ color: "var(--accent)" }}>{PLANS.find(p => p.key === plan).name}</b> активен.
-                QR-код доступа уже в твоём личном кабинете.
+                {t("registerPage.step2.descPre")}<b style={{ color: "var(--accent)" }}>{t(`plan.${plan}.name`)}</b>{t("registerPage.step2.descPost")}
               </p>
               <div className="flex gap-12 mt-16">
-                <button className="btn btn--primary btn--lg" onClick={() => go("/dashboard")}>Открыть кабинет <Icon name="arrow" size={14}/></button>
-                <button className="btn btn--secondary" onClick={() => go("/")}>На главную</button>
+                <button className="btn btn--primary btn--lg" onClick={() => go("/dashboard")}>{t("registerPage.openDashboard")} <Icon name="arrow" size={14}/></button>
+                <button className="btn btn--secondary" onClick={() => go("/")}>{t("registerPage.toHome")}</button>
               </div>
             </div>
           )}
@@ -1007,6 +988,7 @@ function RegisterPage({ go }) {
    DASHBOARD
    ========================================================= */
 function DashboardPage({ go }) {
+  const { t } = useLocale();
   const [tab, setTab] = useStateP("overview");
 
   return (
@@ -1018,14 +1000,14 @@ function DashboardPage({ go }) {
             <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line)", marginBottom: 4 }}>
               <div className="t-avatar" style={{ width: 40, height: 40, marginBottom: 8 }}>ЕК</div>
               <div className="h-display" style={{ fontSize: 16 }}>Ермек К.</div>
-              <div className="mono dim" style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", marginTop: 2 }}>Премиум · активен</div>
+              <div className="mono dim" style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", marginTop: 2 }}>{t("dashboard.planActive")}</div>
             </div>
             {[
-              { k: "overview", l: "Обзор", i: "home" },
-              { k: "qr",       l: "QR-доступ", i: "qr" },
-              { k: "history",  l: "История", i: "clock" },
-              { k: "billing",  l: "Подписка", i: "creditCard" },
-              { k: "settings", l: "Настройки", i: "settings" },
+              { k: "overview", l: t("dashboard.nav.overview"), i: "home" },
+              { k: "qr",       l: t("dashboard.nav.qr"), i: "qr" },
+              { k: "history",  l: t("dashboard.nav.history"), i: "clock" },
+              { k: "billing",  l: t("dashboard.nav.billing"), i: "creditCard" },
+              { k: "settings", l: t("dashboard.nav.settings"), i: "settings" },
             ].map(it => (
               <button key={it.k} className={tab === it.k ? "is-active" : ""} onClick={() => setTab(it.k)}>
                 <Icon name={it.i} size={16}/> {it.l}
@@ -1033,7 +1015,7 @@ function DashboardPage({ go }) {
             ))}
             <div style={{ flex: 1 }}/>
             <button onClick={() => go("/")} style={{ color: "var(--text-3)" }}>
-              <Icon name="login" size={16}/> Выйти
+              <Icon name="login" size={16}/> {t("dashboard.logout")}
             </button>
           </aside>
 
@@ -1052,32 +1034,33 @@ function DashboardPage({ go }) {
 }
 
 function DashOverview() {
+  const { t } = useLocale();
   return (
     <>
       <div className="flex between middle wrap gap-12">
         <div>
-          <Eyebrow>Обзор</Eyebrow>
-          <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>Привет, Ермек.</h1>
+          <Eyebrow>{t("dashOverview.eyebrow")}</Eyebrow>
+          <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>{t("dashOverview.greeting", { name: "Ермек" })}</h1>
         </div>
-        <button className="btn btn--primary"><Icon name="qr" size={14}/> Показать QR</button>
+        <button className="btn btn--primary"><Icon name="qr" size={14}/> {t("dashOverview.showQr")}</button>
       </div>
 
       {/* Stats */}
       <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
         <div className="card">
-          <div className="label">Посещений в этом месяце</div>
+          <div className="label">{t("dashOverview.stat.visits")}</div>
           <div className="stat-num mt-8">24</div>
-          <div className="mono mt-8" style={{ fontSize: 12, color: "var(--good)" }}>+8 vs прошлый месяц</div>
+          <div className="mono mt-8" style={{ fontSize: 12, color: "var(--good)" }}>{t("dashOverview.visitsDeltaTemplate", { n: 8 })}</div>
         </div>
         <div className="card">
-          <div className="label">Часов отыграно</div>
-          <div className="stat-num mt-8">62<span style={{ fontSize: 24, color: "var(--text-3)" }}>ч</span></div>
+          <div className="label">{t("dashOverview.stat.hours")}</div>
+          <div className="stat-num mt-8">62<span style={{ fontSize: 24, color: "var(--text-3)" }}>{t("unit.hour")}</span></div>
           <div className="bar mt-16"><span style={{ width: "62%" }}/></div>
         </div>
         <div className="card">
-          <div className="label">Сэкономлено</div>
+          <div className="label">{t("dashOverview.stat.saved")}</div>
           <div className="stat-num mt-8">48 200 <span style={{ fontSize: 24, color: "var(--text-3)" }}>₸</span></div>
-          <div className="mono mt-8" style={{ fontSize: 12, color: "var(--text-2)" }}>vs оплата по факту</div>
+          <div className="mono mt-8" style={{ fontSize: 12, color: "var(--text-2)" }}>{t("dashOverview.stat.savedVs")}</div>
         </div>
       </div>
 
@@ -1085,21 +1068,21 @@ function DashOverview() {
       <div className="grid" style={{ gridTemplateColumns: "1.4fr 1fr" }}>
         <div className="card">
           <div className="flex between middle mb-16">
-            <h3 className="h-display" style={{ fontSize: 20 }}>Недавние посещения</h3>
-            <button className="mono" style={{ fontSize: 11, color: "var(--accent)" }}>Все →</button>
+            <h3 className="h-display" style={{ fontSize: 20 }}>{t("dashOverview.recent.title")}</h3>
+            <button className="mono" style={{ fontSize: 11, color: "var(--accent)" }}>{t("dashOverview.recent.viewAll")}</button>
           </div>
           <div className="live-feed">
             {[
-              { name: "Game Zone Cyber", city: "Алматы", when: "Сегодня · 19:24", dur: "2ч 14мин" },
-              { name: "Strike Lanes",   city: "Алматы", when: "Вчера · 21:00",  dur: "1ч 30мин" },
-              { name: "Ping Pong Pro",  city: "Алматы", when: "12 дек · 18:40", dur: "45мин"   },
-              { name: "Time Cafe",      city: "Алматы", when: "10 дек · 16:00", dur: "3ч 02мин" },
+              { name: "Game Zone Cyber", city: "Алматы", when: `${t("dashOverview.today")} · 19:24`, dur: `2${t("unit.hour")} 14${t("unit.min")}` },
+              { name: "Strike Lanes",   city: "Алматы", when: `${t("dashOverview.yesterday")} · 21:00`,  dur: `1${t("unit.hour")} 30${t("unit.min")}` },
+              { name: "Ping Pong Pro",  city: "Алматы", when: `12 ${t("dashOverview.dec")} · 18:40`, dur: `45${t("unit.min")}`   },
+              { name: "Time Cafe",      city: "Алматы", when: `10 ${t("dashOverview.dec")} · 16:00`, dur: `3${t("unit.hour")} 02${t("unit.min")}` },
             ].map((v, i) => (
               <div key={i} className="live-row">
                 <span className="live-dot"/>
                 <div>
                   <div style={{ fontWeight: 600 }}>{v.name}</div>
-                  <div className="mono dim" style={{ fontSize: 11 }}>{v.city} · {v.dur}</div>
+                  <div className="mono dim" style={{ fontSize: 11 }}>{cityLabel(v.city, t)} · {v.dur}</div>
                 </div>
                 <span className="live-when">{v.when}</span>
               </div>
@@ -1108,7 +1091,7 @@ function DashOverview() {
         </div>
 
         <div className="card">
-          <h3 className="h-display" style={{ fontSize: 20, marginBottom: 16 }}>Тебе понравится</h3>
+          <h3 className="h-display" style={{ fontSize: 20, marginBottom: 16 }}>{t("dashOverview.recommended.title")}</h3>
           <div className="col gap-12">
             {PARTNERS.slice(6, 10).map((p, i) => {
               const cat = CATEGORIES.find(c => c.key === p.cat);
@@ -1120,7 +1103,7 @@ function DashOverview() {
                   </div>
                   <div className="fill">
                     <div style={{ fontSize: 13, fontWeight: 600 }}>{p.name}</div>
-                    <div className="mono dim" style={{ fontSize: 10 }}>{p.city} · {cat.label}</div>
+                    <div className="mono dim" style={{ fontSize: 10 }}>{cityLabel(p.city, t)} · {t(`category.${cat.key}.label`)}</div>
                   </div>
                   <Icon name="arrowUR" size={14} style={{ color: "var(--text-3)" }}/>
                 </div>
@@ -1133,39 +1116,64 @@ function DashOverview() {
   );
 }
 
+/* Real, scannable QR code (client-side, via qrcode-generator loaded in
+   ChillUP.html) encoding a demo access token — the frontend isn't wired to
+   the backend's signed token endpoint (visits/tokens.py) yet, so this token
+   is a locally generated stand-in refreshed every 60s, not the real
+   backend-issued one. */
 function DashQR() {
+  const { t } = useLocale();
+  const [token, setToken] = useStateP(() => generateAccessToken());
+  const [svg, setSvg] = useStateP("");
+
+  useEffectP(() => {
+    const id = setInterval(() => setToken(generateAccessToken()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffectP(() => {
+    if (!window.qrcode) return;
+    const qr = window.qrcode(0, "M");
+    qr.addData(token);
+    qr.make();
+    setSvg(qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true }));
+  }, [token]);
+
   return (
     <div className="card center" style={{ padding: 48 }}>
-      <Eyebrow>Доступ · LIVE</Eyebrow>
-      <h2 className="h-display mt-16" style={{ fontSize: 32 }}>Покажи на ресепшене</h2>
-      <p className="muted mt-8" style={{ marginBottom: 24 }}>QR обновляется каждые 60 секунд</p>
-      <div style={{ width: 280, height: 280, margin: "0 auto", background: "var(--bg)", border: "1px solid var(--accent)", borderRadius: "var(--radius-card)", display: "grid", placeItems: "center", boxShadow: "var(--glow-accent)" }}>
-        <Icon name="qr" size={200} stroke={1} style={{ color: "var(--accent)" }}/>
+      <Eyebrow>{t("dashQr.eyebrow")}</Eyebrow>
+      <h2 className="h-display mt-16" style={{ fontSize: 32 }}>{t("dashQr.title")}</h2>
+      <p className="muted mt-8" style={{ marginBottom: 24 }}>{t("dashQr.sub")}</p>
+      <div style={{ width: 280, height: 280, margin: "0 auto", background: "#fff", border: "1px solid var(--accent)", borderRadius: "var(--radius-card)", display: "grid", placeItems: "center", boxShadow: "var(--glow-accent)", padding: 20, boxSizing: "border-box" }}>
+        {svg
+          ? <div style={{ width: "100%", height: "100%" }} dangerouslySetInnerHTML={{ __html: svg }}/>
+          : <Icon name="qr" size={200} stroke={1} style={{ color: "var(--accent)" }}/>}
       </div>
-      <div className="mono mt-24" style={{ fontSize: 11, color: "var(--text-3)", letterSpacing: ".14em" }}>ID: CHLLP-2046-ERMK · ПРЕМИУМ</div>
+      <div className="mono mt-24" style={{ fontSize: 11, color: "var(--text-3)", letterSpacing: ".14em" }}>ID: {token} · {t("tier.premium").toUpperCase()}</div>
     </div>
   );
 }
 
 function DashHistory() {
+  const { t } = useLocale();
   const items = Array.from({ length: 12 }, (_, i) => ({
     name: PARTNERS[i % PARTNERS.length].name,
     city: PARTNERS[i % PARTNERS.length].city,
-    date: `${15 - i} дек 2026`,
-    dur: `${1 + (i % 4)}ч ${(i * 13) % 60}мин`,
+    date: `${15 - i} ${t("dashHistory.dec")} 2026`,
+    dur: `${1 + (i % 4)}${t("unit.hour")} ${(i * 13) % 60}${t("unit.min")}`,
   }));
   return (
     <>
-      <Eyebrow>История</Eyebrow>
-      <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>Последние посещения</h1>
+      <Eyebrow>{t("dashHistory.eyebrow")}</Eyebrow>
+      <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>{t("dashHistory.title")}</h1>
       <div className="card" style={{ padding: 0 }}>
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", padding: "16px 24px", borderBottom: "1px solid var(--line)" }}>
-          <span className="label">Заведение</span><span className="label">Город</span><span className="label">Длительность</span><span className="label">Дата</span>
+          <span className="label">{t("dashHistory.col.venue")}</span><span className="label">{t("dashHistory.col.city")}</span><span className="label">{t("dashHistory.col.duration")}</span><span className="label">{t("dashHistory.col.date")}</span>
         </div>
         {items.map((it, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", padding: "16px 24px", borderBottom: i < items.length - 1 ? "1px solid var(--line)" : "none", alignItems: "center" }}>
             <span style={{ fontWeight: 600 }}>{it.name}</span>
-            <span className="muted">{it.city}</span>
+            <span className="muted">{cityLabel(it.city, t)}</span>
             <span className="mono">{it.dur}</span>
             <span className="mono dim">{it.date}</span>
           </div>
@@ -1176,41 +1184,42 @@ function DashHistory() {
 }
 
 function DashBilling() {
+  const { t } = useLocale();
   return (
     <>
-      <Eyebrow>Подписка</Eyebrow>
-      <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>Управление подпиской</h1>
+      <Eyebrow>{t("dashBilling.eyebrow")}</Eyebrow>
+      <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>{t("dashBilling.title")}</h1>
       <div className="card card--accent">
         <div className="flex between middle wrap gap-16">
           <div>
-            <span className="chip chip--accent">АКТИВЕН</span>
-            <h2 className="h-display mt-16" style={{ fontSize: 32 }}>Премиум · 1 990 ₸/мес</h2>
-            <p className="muted mt-8">Следующее списание: 14 января 2027</p>
+            <span className="chip chip--accent">{t("dashBilling.active")}</span>
+            <h2 className="h-display mt-16" style={{ fontSize: 32 }}>{t("dashBilling.planLineTemplate", { plan: t("plan.premium.name"), price: "1 990" })}</h2>
+            <p className="muted mt-8">{t("dashBilling.nextChargeTemplate", { date: t("dashBilling.nextChargeDate") })}</p>
           </div>
           <div className="flex gap-8">
-            <button className="btn btn--secondary">Сменить тариф</button>
-            <button className="btn btn--ghost" style={{ color: "var(--bad)", borderColor: "var(--bad)" }}>Заморозить</button>
+            <button className="btn btn--secondary">{t("dashBilling.changePlan")}</button>
+            <button className="btn btn--ghost" style={{ color: "var(--bad)", borderColor: "var(--bad)" }}>{t("dashBilling.freeze")}</button>
           </div>
         </div>
       </div>
       <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
         <div className="card">
-          <h3 className="h-display" style={{ fontSize: 18 }}>Метод оплаты</h3>
+          <h3 className="h-display" style={{ fontSize: 18 }}>{t("dashBilling.paymentMethod")}</h3>
           <div className="flex gap-12 middle mt-16" style={{ padding: 16, border: "1px solid var(--line)", borderRadius: "var(--radius-card)" }}>
             <Icon name="creditCard" size={28} style={{ color: "var(--accent)" }}/>
             <div className="fill">
               <div style={{ fontWeight: 600 }}>•••• 4521</div>
-              <div className="mono dim" style={{ fontSize: 11 }}>Visa · истекает 09/28</div>
+              <div className="mono dim" style={{ fontSize: 11 }}>{t("dashBilling.cardExpiry")}</div>
             </div>
-            <button className="mono" style={{ fontSize: 11, color: "var(--accent)" }}>Изменить</button>
+            <button className="mono" style={{ fontSize: 11, color: "var(--accent)" }}>{t("dashBilling.change")}</button>
           </div>
         </div>
         <div className="card">
-          <h3 className="h-display" style={{ fontSize: 18 }}>Последние платежи</h3>
+          <h3 className="h-display" style={{ fontSize: 18 }}>{t("dashBilling.recentPayments")}</h3>
           <div className="col gap-8 mt-16">
-            {["14 дек 2026", "14 ноя 2026", "14 окт 2026"].map((d, i) => (
+            {[0, 1, 2].map((i) => (
               <div key={i} className="flex between middle" style={{ padding: "10px 0", borderBottom: i < 2 ? "1px solid var(--line)" : "none" }}>
-                <span className="mono dim" style={{ fontSize: 12 }}>{d}</span>
+                <span className="mono dim" style={{ fontSize: 12 }}>{t(`dashBilling.paymentDate.${i}`)}</span>
                 <span className="mono">1 990 ₸</span>
               </div>
             ))}
@@ -1222,24 +1231,25 @@ function DashBilling() {
 }
 
 function DashSettings() {
+  const { t } = useLocale();
   return (
     <>
-      <Eyebrow>Настройки</Eyebrow>
-      <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>Профиль и уведомления</h1>
+      <Eyebrow>{t("dashSettings.eyebrow")}</Eyebrow>
+      <h1 className="h-display" style={{ fontSize: 40, marginTop: 12 }}>{t("dashSettings.title")}</h1>
       <div className="card">
         <div className="col gap-16">
           <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <div className="field"><span className="label">Имя</span><input className="input" defaultValue="Ермек"/></div>
-            <div className="field"><span className="label">Фамилия</span><input className="input" defaultValue="Касенов"/></div>
+            <div className="field"><span className="label">{t("registerPage.field.firstName")}</span><input className="input" defaultValue="Ермек"/></div>
+            <div className="field"><span className="label">{t("registerPage.field.lastName")}</span><input className="input" defaultValue="Касенов"/></div>
           </div>
-          <div className="field"><span className="label">Email</span><input className="input" defaultValue="ermek@chillup.kz"/></div>
-          <div className="field"><span className="label">Телефон</span><input className="input" defaultValue="+7 (777) 123-45-67"/></div>
+          <div className="field"><span className="label">{t("registerPage.field.email")}</span><input className="input" defaultValue="ermek@chillup.kz"/></div>
+          <div className="field"><span className="label">{t("registerPage.field.phone")}</span><input className="input" defaultValue="+7 (777) 123-45-67"/></div>
           <div className="divider"/>
           {[
-            "Push о новых заведениях рядом",
-            "Email о платежах и продлении",
-            "SMS о подтверждении посещения",
-            "Telegram о турнирах и событиях",
+            t("dashSettings.notif.push"),
+            t("dashSettings.notif.email"),
+            t("dashSettings.notif.sms"),
+            t("dashSettings.notif.telegram"),
           ].map((l, i) => (
             <div key={i} className="flex between middle" style={{ padding: "8px 0" }}>
               <span style={{ fontSize: 14 }}>{l}</span>
@@ -1247,8 +1257,8 @@ function DashSettings() {
             </div>
           ))}
           <div className="flex gap-12 mt-16">
-            <button className="btn btn--primary">Сохранить</button>
-            <button className="btn btn--ghost">Отмена</button>
+            <button className="btn btn--primary">{t("dashSettings.save")}</button>
+            <button className="btn btn--ghost">{t("dashSettings.cancel")}</button>
           </div>
         </div>
       </div>

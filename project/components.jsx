@@ -1,5 +1,6 @@
 // components.jsx — shared UI primitives for ChillUP
 // Exports to window: Brand, Nav, Footer, Icon, Eyebrow, Section, useRoute
+// Depends on: i18n.js (useLocale, LangSwitch, tierLabel, tagLabel, cityLabel)
 
 const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
@@ -98,11 +99,12 @@ function SectionHead({ kicker, title, sub, align = "left", id }) {
 
 /* ========== NAV ========== */
 function Nav({ route, go }) {
+  const { t } = useLocale();
   const items = [
-    { path: "/", label: "Главная" },
-    { path: "/pricing", label: "Тарифы" },
-    { path: "/partners", label: "Партнёры" },
-    { path: "/faq", label: "FAQ" },
+    { path: "/", label: t("nav.home") },
+    { path: "/pricing", label: t("nav.pricing") },
+    { path: "/partners", label: t("nav.partners") },
+    { path: "/faq", label: t("nav.faq") },
   ];
   return (
     <nav className="nav">
@@ -114,10 +116,11 @@ function Nav({ route, go }) {
               {it.label}
             </button>
           ))}
-          <button className="nav-link" onClick={() => go("/login")}>Войти</button>
+          <button className="nav-link" onClick={() => go("/login")}>{t("nav.login")}</button>
           <button className="btn btn--primary btn--sm" onClick={() => go("/register")} style={{ marginLeft: 8 }}>
-            Регистрация <Icon name="arrow" size={14}/>
+            {t("nav.register")} <Icon name="arrow" size={14}/>
           </button>
+          <LangSwitch/>
         </div>
       </div>
     </nav>
@@ -126,6 +129,7 @@ function Nav({ route, go }) {
 
 /* ========== FOOTER ========== */
 function Footer({ go }) {
+  const { t } = useLocale();
   return (
     <footer className="footer">
       <div className="container">
@@ -133,7 +137,7 @@ function Footer({ go }) {
           <div className="footer-col">
             <Brand />
             <p className="muted" style={{ fontSize: 14, marginTop: 16, lineHeight: 1.6, maxWidth: 320 }}>
-              Одна подписка — бесконечные развлечения. Компьютерные клубы, антикафе, боулинг, настольный теннис.
+              {t("footer.tagline")}
             </p>
             <div className="flex gap-8 mt-24">
               <button className="btn btn--secondary btn--sm"><Icon name="apple" size={14}/> App Store</button>
@@ -141,24 +145,24 @@ function Footer({ go }) {
             </div>
           </div>
           <div className="footer-col">
-            <h6>Продукт</h6>
+            <h6>{t("footer.product")}</h6>
             <ul>
-              <li><a onClick={() => go("/")}>Главная</a></li>
-              <li><a onClick={() => go("/pricing")}>Тарифы</a></li>
-              <li><a onClick={() => go("/partners")}>Партнёры</a></li>
-              <li><a onClick={() => go("/faq")}>FAQ</a></li>
+              <li><a onClick={() => go("/")}>{t("nav.home")}</a></li>
+              <li><a onClick={() => go("/pricing")}>{t("nav.pricing")}</a></li>
+              <li><a onClick={() => go("/partners")}>{t("nav.partners")}</a></li>
+              <li><a onClick={() => go("/faq")}>{t("nav.faq")}</a></li>
             </ul>
           </div>
           <div className="footer-col">
-            <h6>Аккаунт</h6>
+            <h6>{t("footer.account")}</h6>
             <ul>
-              <li><a onClick={() => go("/login")}>Войти</a></li>
-              <li><a onClick={() => go("/register")}>Регистрация</a></li>
-              <li><a onClick={() => go("/dashboard")}>Личный кабинет</a></li>
+              <li><a onClick={() => go("/login")}>{t("nav.login")}</a></li>
+              <li><a onClick={() => go("/register")}>{t("nav.register")}</a></li>
+              <li><a onClick={() => go("/dashboard")}>{t("footer.dashboardLink")}</a></li>
             </ul>
           </div>
           <div className="footer-col">
-            <h6>Контакты</h6>
+            <h6>{t("footer.contacts")}</h6>
             <ul>
               <li className="mono dim">info@chillup.kz</li>
               <li className="mono dim">+7 (800) 123-45-67</li>
@@ -176,16 +180,23 @@ function Footer({ go }) {
 }
 
 /* ========== CATEGORY DATA ========== */
+/* label/desc are localized via t('category.<key>.label'|'.desc') at render
+   sites (see pages.jsx) rather than stored here, so both languages read
+   from the single i18n.js dictionary. */
 const CATEGORIES = [
-  { key: "pc",      label: "PC-клубы",         icon: "joystick", desc: "Игровые ПК, периферия, киберспорт", count: 142, accent: "" },
-  { key: "tennis",  label: "Настольный теннис", icon: "tennis",   desc: "Профи столы, ракетки в прокат",       count: 38,  accent: "is-magenta" },
-  { key: "bowling", label: "Боулинг",           icon: "bowling",  desc: "Дорожки, бар, компании от 2 до 20",   count: 24,  accent: "is-violet" },
-  { key: "anticafe",label: "Антикафе",          icon: "coffee",   desc: "Время в подарок, настолки, чай",      count: 67,  accent: "" },
-  { key: "board",   label: "Настольные игры",   icon: "cards",    desc: "1500+ игр, гейм-мастера",             count: 19,  accent: "is-magenta" },
-  { key: "vr",      label: "VR & аркады",       icon: "vr",       desc: "VR-арены, симуляторы, аркадные авт.", count: 28,  accent: "is-violet" },
+  { key: "pc",      icon: "joystick", count: 142, accent: "" },
+  { key: "tennis",  icon: "tennis",   count: 38,  accent: "is-magenta" },
+  { key: "bowling", icon: "bowling",  count: 24,  accent: "is-violet" },
+  { key: "anticafe",icon: "coffee",   count: 67,  accent: "" },
+  { key: "board",   icon: "cards",    count: 19,  accent: "is-magenta" },
+  { key: "vr",      icon: "vr",       count: 28,  accent: "is-violet" },
 ];
 
 /* ========== PARTNERS DATA ========== */
+/* city/tags/tier are kept as canonical Russian strings (used for
+   filtering/search/comparisons); translate only for display via
+   cityLabel()/tagLabel()/tierLabel() from i18n.js. Venue names and
+   addresses are proper nouns and aren't translated. */
 const PARTNERS = [
   { name: "Game Zone Cyber",   city: "Алматы",    address: "пр. Абая, 150",         tags: ["PC", "VR", "Консоли"],     tier: "Премиум",  cat: "pc" },
   { name: "Strike Lanes",      city: "Астана",    address: "пр. Кабанбай батыра, 28", tags: ["Боулинг", "Бар"],         tier: "Базовый",  cat: "bowling" },

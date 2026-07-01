@@ -375,6 +375,22 @@ section.tight { padding: 64px 0; }
 }
 .toggle-opt.is-on { background: var(--accent); color: #000; }
 
+/* ========== LANG SWITCH ========== */
+.lang-switch {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 3px; border: 1px solid var(--line);
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+}
+.lang-switch-opt {
+  padding: 6px 10px; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  color: var(--text-3); border-radius: var(--radius-chip);
+  cursor: pointer; transition: all .2s ease;
+  font-family: var(--font-mono);
+}
+.lang-switch-opt:hover { color: var(--text-2); }
+.lang-switch-opt.is-active { background: var(--accent); color: #000; }
+
 .plan-card { display: flex; flex-direction: column; min-height: 580px; padding: 32px; }
 .plan-card.is-featured { border-color: var(--accent); box-shadow: var(--glow-accent); position: relative; }
 .plan-name { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin: 0 0 8px; }
